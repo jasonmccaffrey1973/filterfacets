@@ -1,8 +1,15 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components"
 
-const FilterFacet = ({facet, toggleFacet, toggleItem, selectOnly, updateSearch}) => {
-    const items = facet.filterdItems ?? facet.items;
+const FilterFacet = ({facet, toggleFacet, toggleItem, selectOnly, updateSearch, selectAllItems, deSelectAllItems}) => {
+    const items = facet.filterdItems || facet.items;
+
+    const handleButtonClick = ({facet, item, isChecked}) => {
+        if (facet.allSelected) {
+            deSelectAllItems(facet)
+        } else (isChecked) ? selectAllItems(facet) : selectOnly(facet, item)
+    }
+
   return (
     <StyledFilterFacet aria-expanded={facet.open}>
         <div className="facet-header" onClick={toggleFacet}>
@@ -11,25 +18,23 @@ const FilterFacet = ({facet, toggleFacet, toggleItem, selectOnly, updateSearch})
         </div>
         <ul className="facet-body">
             <div className="search">
-                <input type="search" placeholder={`Search ${facet.title}:`} list={`${facet.title}List`} onChange={updateSearch(facet.accessor)} />
+                <input type="search" placeholder={`Search ${facet.title}:`} list={`${facet.title}List`} onChange={e => updateSearch({accessor: facet.accessor, value: e.target.value})} />
                 <datalist id={`${facet.title}List`}>
                     {items.map(item => (
                         <option key={item.value} value={item.label} />
                     ))}
                 </datalist>
             </div>
-            {facet.items.map(item => {
+            {(facet.items.length > 0) ? facet.items.map(item => {
                 const id = `${facet.accessor}-${item.value}`;                
                 return (
                     <li className="facet-item" key={id} onClick={()=> toggleItem(facet, item)}>
-                        <button className="select-only" onClick={e=>{
-                            e.stopPropagation();
-                            selectOnly(facet, item)
-                        }}>Select Only</button>
+                        <ToggleFilterButton clickFn={ handleButtonClick } isChecked={item.selected} facet={facet} item={item}/>
                         <input id={id} type="checkbox" value={item.value} checked={item.selected} readOnly />
                         <label htmlFor={id}> {item.label} </label>
                     </li>
-                )}       
+                )}) : (
+                    <li className="facet-item none">No Matching Filters</li>      
             )}
         </ul>
         {/* <div className="facet-footer">
@@ -38,8 +43,24 @@ const FilterFacet = ({facet, toggleFacet, toggleItem, selectOnly, updateSearch})
   )
 }
 
-
 export default FilterFacet
+
+const ToggleFilterButton = ({ facet, item, isChecked, clickFn }) => {
+    const allChecked = facet?.allSelected ?? false;
+
+    return (
+        <StyledSelectionButton
+            onClick={e => {
+                e.stopPropagation();
+                clickFn({ facet, item, isChecked, allChecked });
+            }}
+        >
+            {allChecked ? 'Show None' : isChecked ? 'Show All' : 'Show only'}
+        </StyledSelectionButton>
+    );
+};
+
+
 
 const StyledFilterFacet = styled.div`
     --arrowThickness: 0.1rem;
@@ -109,6 +130,7 @@ const StyledFilterFacet = styled.div`
         position: sticky;
         top: 2px;
         z-index: 10;
+        padding-block-end: 0.5rem;
         input[type="search"] {
             width: calc(100% - 1rem);
             margin-inline: 0.5rem;
@@ -132,7 +154,7 @@ const StyledFilterFacet = styled.div`
         input[type="checkbox"] {
             pointer-events: none;
         }
-        .select-only {
+        button {
             z-index: -1;
             opacity: 0;
             position: absolute;
@@ -143,10 +165,15 @@ const StyledFilterFacet = styled.div`
         &:hover {
             background-color: #f9f9f9;
             cursor: pointer;
-            .select-only {
+            button {
                 z-index: 10;
                 opacity: 1;
             }
+        }
+        &.none {
+            display: grid;
+            place-items: center;
+            padding: 1rem;
         }
     }
 
@@ -158,6 +185,8 @@ const StyledFilterFacet = styled.div`
         padding: 1rem;
         border-top: 1px solid #ccc;
     }
+`
 
-
+const StyledSelectionButton = styled.button`
+    
 `

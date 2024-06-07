@@ -65,7 +65,7 @@ function App() {
           search: '' },
     };
 
-    const { filterFacetState, closeAllFacets, expandAllFacets, toggleFacet, toggleSelected, selectOnly, updateSearch } = useFilterFacets({ initialState: INITIAL_STATE });
+    const { filterFacetState, closeAllFacets, expandAllFacets, toggleFacet, toggleSelected, selectOnly, updateSearch, selectAllItems, deSelectAllItems } = useFilterFacets({ initialState: INITIAL_STATE });
 
     return (
         <div className="App">
@@ -83,6 +83,8 @@ function App() {
                         toggleItem={toggleSelected}
                         selectOnly={selectOnly}
                         updateSearch={updateSearch}
+                        selectAllItems={selectAllItems}
+                        deSelectAllItems={deSelectAllItems}
                     />
                 ))}
             </main>
