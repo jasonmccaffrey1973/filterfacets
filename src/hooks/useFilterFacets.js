@@ -152,7 +152,6 @@ const updateSearch = useCallback(({ accessor, value }) => {
     });
 }, []);
 
-
 /** ----------------------------------------------------------------
  * Select all items within a specific facet.
  * @param {Object} facet - The facet object to select all items.
@@ -182,13 +181,13 @@ const deSelectAllItems = useCallback(facet => {
 }, []);
 
     
-
-    // useEffect(() => {
-    //     console.log('FF State::: ', filterFacetState);
-    // }
-    // , [filterFacetState]);
-
-
+/** ----------------------------------------------------------------
+  * Add hooks / functions for state change of the filter facets.
+  * ---------------------------------------------------------------- */
+useEffect(() => {
+    console.log('FF State::: ', filterFacetState);
+}
+, [filterFacetState]);
 
     return {
         filterFacetState,
